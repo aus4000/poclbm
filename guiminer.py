@@ -866,12 +866,12 @@ class MinerTab(wx.Panel):
         """Set up the command line for poclbm."""
         folder = get_module_path()
         if USE_MOCK:
-            executable = "python mockBitcoinMiner.py"
+            executable = "python2 mockBitcoinMiner.py"
         else:
             if hasattr(sys, 'frozen'):
                 executable = "poclbm.exe"
             else:
-                executable = "python poclbm.py"
+                executable = "python2 poclbm.py"
         cmd = "%s %s:%s@%s:%s --device=%d --platform=%d --verbose -r1 %s" % (
                 executable,
                 self.txt_username.GetValue(),
@@ -934,7 +934,7 @@ class MinerTab(wx.Panel):
         """Set up the command line for cgminer."""
         path = self.external_path
         if path.endswith('.py'):
-            path = "python " + path
+            path = "python2.7 " + path
 
         # Command line arguments for cgminer here:
         # -u <username>
@@ -993,20 +993,35 @@ class MinerTab(wx.Panel):
             # for cgminer: 
             # We need only the STDOUT for meaningful messages.
             if conf_func == self.configure_subprocess_cgminer:
-                self.miner = subprocess.Popen(cmd, cwd=cwd,
+		if sys.platform == "win32":
+                	self.miner = subprocess.Popen(cmd, cwd=cwd,
                                               stdout=subprocess.PIPE,
                                               stderr=None,
                                               universal_newlines=True,
                                               creationflags=flags,
                                               shell=(sys.platform != 'win32'))
+		elif sys.platform == "linux2":
+			                self.miner = subprocess.Popen(cmd, cwd=cwd,
+                                              stdout=subprocess.PIPE,
+                                              stderr=None,
+                                              universal_newlines=True,
+                                              creationflags=flags,
+                                              shell="/bin/sh")
             else:
-                self.miner = subprocess.Popen(cmd, cwd=cwd,
+		if sys.platform == "win32":
+			self.miner = subprocess.Popen(cmd, cwd=cwd,
                                               stdout=subprocess.PIPE,
                                               stderr=subprocess.STDOUT,
                                               universal_newlines=True,
                                               creationflags=flags,
-                                              shell=(sys.platform != 'win32'))
-            
+						shell=(sys.platform != "win32"))
+		elif sys.platform == "linux2":
+	                self.miner = subprocess.Popen(cmd, cwd=cwd,
+                                              stdout=subprocess.PIPE,
+                                              stderr=subprocess.STDOUT,
+                                              universal_newlines=True,
+                                              creationflags=flags, 
+						shell="/bin/sh")   
         except OSError:
             raise #TODO: the folder or exe could not exist
         self.miner_listener = listener_cls(self, self.miner)
