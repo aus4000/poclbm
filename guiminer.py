@@ -866,12 +866,12 @@ class MinerTab(wx.Panel):
         """Set up the command line for poclbm."""
         folder = get_module_path()
         if USE_MOCK:
-            executable = "python2 mockBitcoinMiner.py"
+            executable = "python2.7 mockBitcoinMiner.py"
         else:
             if hasattr(sys, 'frozen'):
                 executable = "poclbm.exe"
             else:
-                executable = "python2 poclbm.py"
+                executable = "python2.7 poclbm.py"
         cmd = "%s %s:%s@%s:%s --device=%d --platform=%d --verbose -r1 %s" % (
                 executable,
                 self.txt_username.GetValue(),
@@ -917,7 +917,7 @@ class MinerTab(wx.Panel):
         """Set up the command line for phoenix miner."""
         path = self.external_path
         if path.endswith('.py'):
-            path = "python " + path
+            path = "python2.7 " + path
 
         cmd = "%s -u http://%s:%s@%s:%s PLATFORM=%d DEVICE=%d %s" % (
             path,
